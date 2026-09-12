@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="簡約現代風待辦事項管理工具，支援工作與生活分類及本地儲存。">
+  <title>Minimalist Todo - 簡約待辦清單</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="background-decor">
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+  </div>
+
+  <main class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-title-group">
+        <h1 id="app-title">Focus & Do</h1>
+        <p class="subtitle">極簡風格任務管理工具</p>
+      </div>
+      <button id="theme-toggle-btn" class="icon-btn" aria-label="切換深淺模式" title="切換主題">
+        <svg id="theme-icon-sun" class="theme-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg id="theme-icon-moon" class="theme-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Task Input Section -->
+    <section class="task-input-card">
+      <form id="todo-form">
+        <div class="input-row">
+          <input type="text" id="task-input" placeholder="今天想完成什麼任務..." autocomplete="off" required>
+          <button type="submit" id="add-task-btn" class="btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>新增</span>
+          </button>
+        </div>
+        
+        <div class="options-row">
+          <div class="category-selector">
+            <span class="label-text">分類：</span>
+            <label class="radio-label">
+              <input type="radio" name="category" value="work" checked>
+              <span class="badge badge-work-radio">💼 工作</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="category" value="life">
+              <span class="badge badge-life-radio">🌱 生活</span>
+            </label>
+          </div>
+          <div class="priority-selector">
+            <select id="priority-input" aria-label="選擇優先級">
+              <option value="high">🔥 優先級：高 (High)</option>
+              <option value="medium" selected>⚡ 優先級：中 (Medium)</option>
+              <option value="low">☕ 優先級：低 (Low)</option>
+            </select>
+          </div>
+          <div class="assignee-selector">
+            <span class="label-text">負責人：</span>
+            <input type="text" id="assignee-input" placeholder="名字 (選填)" autocomplete="off" aria-label="任務負責人">
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <!-- Filters & Stats Bar -->
+    <section class="controls-bar">
+      <!-- Category Tabs -->
+      <div class="filter-tabs" id="category-filters" role="tablist" aria-label="任務類別篩選">
+        <button class="tab-btn active" data-category="all" role="tab" aria-selected="true">全部</button>
+        <button class="tab-btn" data-category="work" role="tab" aria-selected="false">
+          💼 工作 <span class="count-badge" id="work-count">0</span>
+        </button>
+        <button class="tab-btn" data-category="life" role="tab" aria-selected="false">
+          🌱 生活 <span class="count-badge" id="life-count">0</span>
+        </button>
+      </div>
+
+      <!-- Status Filters -->
+      <div class="status-filters" id="status-filters">
+        <button class="status-btn active" data-status="all">所有狀態</button>
+        <button class="status-btn" data-status="active">進行中</button>
+        <button class="status-btn" data-status="completed">已完成</button>
+      </div>
+    </section>
+
+    <!-- Kanban Board Section -->
+    <section class="task-list-section">
+      <div id="kanban-board" class="kanban-board">
+        <!-- Column 1: To-do -->
+        <div class="kanban-column" data-status="todo">
+          <div class="column-header">
+            <h2 class="column-title">
+              <span class="column-icon">📌</span> To-do
+            </h2>
+            <span class="count-badge" id="todo-count">0</span>
+          </div>
+          <ul id="column-list-todo" class="task-column-list" data-status="todo" aria-label="To-do 任務列表">
+            <!-- Items injected dynamically -->
+          </ul>
+        </div>
+
+        <!-- Column 2: Process -->
+        <div class="kanban-column" data-status="process">
+          <div class="column-header">
+            <h2 class="column-title">
+              <span class="column-icon">⚡</span> Process
+            </h2>
+            <span class="count-badge" id="process-count">0</span>
+          </div>
+          <ul id="column-list-process" class="task-column-list" data-status="process" aria-label="Process 進行中任務列表">
+            <!-- Items injected dynamically -->
+          </ul>
+        </div>
+
+        <!-- Column 3: Done -->
+        <div class="kanban-column" data-status="done">
+          <div class="column-header">
+            <h2 class="column-title">
+              <span class="column-icon">✅</span> Done
+            </h2>
+            <span class="count-badge" id="done-count">0</span>
+          </div>
+          <ul id="column-list-done" class="task-column-list" data-status="done" aria-label="Done 已完成任務列表">
+            <!-- Items injected dynamically -->
+          </ul>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="empty-state hidden">
+        <div class="empty-icon">✨</div>
+        <p class="empty-text">尚無待辦事項，好好放鬆或是新增一項任務吧！</p>
+      </div>
+    </section>
+
+    <!-- Footer Stats & Actions -->
+    <footer class="app-footer">
+      <div class="stats-info">
+        <span id="remaining-count">0 個未完成任務</span>
+      </div>
+      <button id="clear-completed-btn" class="btn-text danger-text">清除已完成</button>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
