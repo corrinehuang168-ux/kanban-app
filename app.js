@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const taskInput = document.getElementById('task-input');
   const priorityInput = document.getElementById('priority-input');
   const assigneeInput = document.getElementById('assignee-input');
+  const duedateInput = document.getElementById('duedate-input');
   const emptyState = document.getElementById('empty-state');
   
   const categoryFilters = document.getElementById('category-filters');
@@ -161,6 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const category = categoryRadio ? categoryRadio.value : 'work';
     const priority = priorityInput.value;
     const assignee = (assigneeInput && assigneeInput.value.trim()) ? assigneeInput.value.trim() : '未指定';
+    const dueDate = duedateInput ? duedateInput.value : '';
 
     const newTask = {
       id: Date.now().toString(),
@@ -168,6 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category,
       priority,
       assignee,
+      dueDate,
       status: 'todo',
       createdAt: Date.now()
     };
@@ -178,6 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Reset form
     taskInput.value = '';
     if (assigneeInput) assigneeInput.value = '';
+    if (duedateInput) duedateInput.value = '';
     taskInput.focus();
     render();
   }
@@ -276,6 +280,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const assignee = task.assignee || '未指定';
 
+        let dueDateTagHtml = '';
+        if (task.dueDate) {
+          const formattedDate = task.dueDate.replace(/-/g, '/');
+          const now = new Date();
+          const y = now.getFullYear();
+          const m = String(now.getMonth() + 1).padStart(2, '0');
+          const d = String(now.getDate()).padStart(2, '0');
+          const todayStr = `${y}-${m}-${d}`;
+
+          const isOverdueOrToday = task.dueDate <= todayStr;
+          const overdueClass = isOverdueOrToday ? 'overdue' : '';
+          dueDateTagHtml = `<span class="due-date-tag ${overdueClass}">📅 ${formattedDate}</span>`;
+        }
+
         li.innerHTML = `
           <div class="task-left">
             <div class="task-content">
@@ -284,6 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="category-tag ${task.category}">${categoryText}</span>
                 ${priorityText}
                 <span class="assignee-tag">👤 <span class="assignee-name"></span></span>
+                ${dueDateTagHtml}
               </div>
             </div>
           </div>
